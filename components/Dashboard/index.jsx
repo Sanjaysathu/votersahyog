@@ -32,7 +32,8 @@ export default function DashboardComponent() {
 
   const fetchPollingStationDetails = async (booth_name) => {
     const booth_id = booth_name.split("-")[0]?.trim();
-    const res = await fetch(`/api/booth-details/${booth_id}`, { method: "GET" });
+    const constituency_id = selectedConstituency.split(" ")[0]?.trim();
+    const res = await fetch(`/api/booth-details?booth_id=${booth_id}&constituency_id=${constituency_id}`, { method: "GET" });
     if (res.ok) {
       const res_json = await res.json();
       setLiveCount(res_json.data);
