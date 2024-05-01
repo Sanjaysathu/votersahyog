@@ -37,6 +37,7 @@ export default function DashboardComponent() {
       const res_json = await res.json();
       setLiveCount(res_json.data);
     } else {
+      setLiveCount({});
       const res_json = await res.json();
       toast.error(res_json.message);
     }
