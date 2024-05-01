@@ -6,7 +6,7 @@ const defaultUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Voter Sahyog",
-  description: "Dashboard to know about live count of people standing in polling station",
+  description: "Stay updated with live data on people standing in polling booths",
 };
 
 export default function RootLayout({ children }) {
