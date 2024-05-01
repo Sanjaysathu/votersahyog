@@ -15,8 +15,6 @@ export default function BoothDetailsFormComponent({ booth_details }) {
     female_count: booth_details.female_count || "",
   });
 
-  console.log(state);
-
   const updateBoothDetails = async () => {
     const res = await fetch("/api/booth-details-update", { method: "PATCH", body: JSON.stringify({ ...state }), headers: { "Content-Type": "application/json" } });
     if (res.ok) {
@@ -72,6 +70,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
               className="rounded-md px-4 py-2 bg-inherit border mb-6"
               name="male_count"
               type="text"
+              inputMode="numeric"
               value={state.male_count}
               onChange={(e) => {
                 let value = e.target.value;
@@ -91,6 +90,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
               className="rounded-md px-4 py-2 bg-inherit border mb-6"
               name="female_count"
               type="text"
+              inputMode="numeric"
               value={state.female_count}
               onChange={(e) => {
                 const value = e.target.value;
