@@ -24,7 +24,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
   };
 
   return (
-    <div className="mt-6 flex items-center justify-center px-4 md:w-1/3">
+    <div className="mt-6 w-full px-4 md:w-1/3">
       <Toaster position="bottom-center" />
       <form>
         <div className="mb-6">
