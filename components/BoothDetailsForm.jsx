@@ -29,7 +29,9 @@ export default function BoothDetailsFormComponent({ booth_details }) {
       <form>
         <div className="mb-6">
           <div className="text-md font-semibold">Constituency</div>
-          <div>{booth_details.constituency}</div>
+          <div>
+            {booth_details.constituency_id} - {booth_details.constituency}
+          </div>
           {/* <Select value={{ label: booth_details.constituency, value: booth_details.constituency }} instanceId="constituency" /> */}
         </div>
         <div className="mb-6">
