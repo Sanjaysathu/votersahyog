@@ -112,7 +112,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
             />
           </div>
         </div>
-        <div>
+        <div className="mb-10">
           <SubmitButton formAction={updateBoothDetails} className="bg-black rounded-md px-10 py-2 text-white mb-2" pendingText="Submitting...">
             Submit
           </SubmitButton>
