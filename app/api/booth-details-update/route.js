@@ -15,7 +15,7 @@ export async function PATCH(request) {
   const { data: booth_details } = await supabase.from("booth-details").select("*").eq("booth_officer_email", user.email);
   // console.log(sid);
 
-  if (booth_details.length > 0) {
+  if ((booth_details || []).length > 0) {
     // console.log(Users);
     const { data, error } = await supabase.from("booth-details").update(requestBody).eq("booth_officer_email", user.email).select();
     if (error) {
