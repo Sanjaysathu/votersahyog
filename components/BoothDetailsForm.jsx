@@ -1,5 +1,6 @@
 "use client";
 import { SubmitButton } from "@/app/login/submit-button";
+import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 // import Select from "react-select";
@@ -10,9 +11,12 @@ const isValidNumber = (value) => {
 
 export default function BoothDetailsFormComponent({ booth_details }) {
   const [state, setState] = useState({
-    entry_time: new Date().toLocaleTimeString().slice(0, 5),
+    entry_time: new Date().toLocaleTimeString().slice(0, -3),
     male_count: booth_details.male_count || "",
     female_count: booth_details.female_count || "",
+    booth_id: booth_details.booth_id,
+    constituency_id: booth_details.constituency_id,
+    booth_image: "",
   });
 
   const updateBoothDetails = async () => {
@@ -23,31 +27,47 @@ export default function BoothDetailsFormComponent({ booth_details }) {
     }
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const supabase = createClient();
+    const file_path = `/${Date.now().toString()}-${file.name}`;
+    const { data, error } = await supabase.storage.from("booth-pictures").upload(file_path, file);
+    if (error) {
+      // Handle error
+    } else {
+      setState((prevState) => ({ ...prevState, booth_image: `https://mfyxvwjwekbbihjgapjr.supabase.co/storage/v1/object/public/booth-pictures${file_path}` }));
+      console.log(data);
+      // https://mfyxvwjwekbbihjgapjr.supabase.co/storage/v1/object/public/booth-pictures/challenge-5.svg
+      // Handle success
+    }
+  };
+
   return (
-    <div className="mt-6 w-full px-4 md:w-1/3">
+    <div className="mt-6 w-full px-4 md:w-1/3 mb-20">
       <Toaster position="bottom-center" />
       <form>
         <div className="mb-6">
-          <div className="text-md font-semibold">Constituency</div>
+          <div className="text-md font-medium">Constituency</div>
           <div>
             {booth_details.constituency_id} - {booth_details.constituency}
           </div>
           {/* <Select value={{ label: booth_details.constituency, value: booth_details.constituency }} instanceId="constituency" /> */}
         </div>
         <div className="mb-6">
-          <div className="text-md font-semibold">Block</div>
+          <div className="text-md font-medium">Block</div>
           <div>{booth_details.block_name}</div>
           {/* <Select value={{ label: booth_details.block_name, value: booth_details.block_name }} instanceId="block" /> */}
         </div>
         <div className="mb-6">
-          <div className="text-md font-semibold">Polling Booth</div>
+          <div className="text-md font-medium">Polling Booth</div>
           <div>
             {booth_details.booth_id} - {booth_details.booth_name}
           </div>
           {/* <Select value={{ label: booth_details.booth_name, value: booth_details.booth_name }} instanceId="booth name" /> */}
         </div>
         <div>
-          <label className="text-md font-semibold" htmlFor="time">
+          <label className="text-md font-medium" htmlFor="time">
             Time of entry
           </label>
           <div>
@@ -64,7 +84,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           </div>
         </div>
         <div>
-          <label className="text-md font-semibold" htmlFor="male_count">
+          <label className="text-md font-medium" htmlFor="male_count">
             Number of male persons in line
           </label>
           <div>
@@ -84,7 +104,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           </div>
         </div>
         <div>
-          <label className="text-md font-semibold" htmlFor="female_count">
+          <label className="text-md font-medium" htmlFor="female_count">
             Number of female persons in line
           </label>
           <div>
@@ -104,7 +124,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           </div>
         </div>
         <div>
-          <label className="text-md font-semibold">Total number of persons in line</label>
+          <label className="text-md font-medium">Total number of persons in line</label>
           <div>
             <input
               className="rounded-md px-4 py-2 bg-inherit border mb-6 cursor-not-allowed read-only:bg-gray-200"
@@ -113,6 +133,15 @@ export default function BoothDetailsFormComponent({ booth_details }) {
               readOnly
             />
           </div>
+        </div>
+        <div className="mb-6">
+          <div className="text-md font-medium mb-2">Picture of the booth</div>
+          {state.booth_image && (
+            <a href={state.booth_image} target="_blank" className="mb-3 block">
+              <img src={state.booth_image} height="200px" width={200} alt="booth image" />
+            </a>
+          )}
+          <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full" />
         </div>
         <div className="mb-10">
           <SubmitButton formAction={updateBoothDetails} className="bg-black rounded-md px-10 py-2 text-white mb-2" pendingText="Submitting...">
