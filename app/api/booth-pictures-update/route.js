@@ -1,7 +1,7 @@
 import { createClient } from "../../../utils/supabase/server";
 import { NextResponse } from "next/server";
 
-export async function PATCH(request) {
+export async function POST(request) {
   const supabase = createClient();
   const requestBody = await request.json();
   const {
@@ -17,11 +17,10 @@ export async function PATCH(request) {
 
   if ((booth_details || []).length > 0) {
     // console.log(Users);
-    // const { error: boothError } = await supabase.from("booth-details").update(requestBody).eq("booth_officer_email", user.email).select();
-    const { error: boothHistoryError } = await supabase.from("booth-history").insert([requestBody]).select();
+    const { error: boothError } = await supabase.from("booth-details").update(requestBody).eq("booth_officer_email", user.email).select();
     // const { data, error } = await supabase.from("booth-history").const { data, error } = await supabase.from("booth-details").update(requestBody).eq("booth_officer_email", user.email).select(); (requestBody).eq("booth_officer_email", user.email).select();
-    if (boothHistoryError) {
-      return NextResponse.json({ message: boothHistoryError.message }, { status: 400 });
+    if (boothError) {
+      return NextResponse.json({ message: boothError.message }, { status: 400 });
     }
     return NextResponse.json({ message: "Polling station details updated" }, { status: 200 });
   }

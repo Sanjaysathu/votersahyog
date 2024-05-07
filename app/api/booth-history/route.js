@@ -23,14 +23,10 @@ export async function GET(request, { params }) {
     return NextResponse.json({ message: "Polling station number is empty" }, { status: 400 });
   }
 
-  const { data: booth_details } = await supabase
-    .from("booth-details")
-    .select("booth_picture_1,booth_picture_2,booth_picture_3")
-    .eq("booth_id", booth_id)
-    .eq("constituency_id", constituency_id);
+  const { data: booth_history } = await supabase.from("booth-history").select("*").eq("booth_id", booth_id).eq("constituency_id", constituency_id);
 
-  if ((booth_details || []).length > 0) {
-    return NextResponse.json({ message: "Polling station details found", data: booth_details[0] }, { status: 200 });
+  if ((booth_history || []).length > 0) {
+    return NextResponse.json({ message: "Polling station history found", data: booth_history }, { status: 200 });
   }
   return NextResponse.json({ message: "Polling station data not found" }, { status: 400 });
 }

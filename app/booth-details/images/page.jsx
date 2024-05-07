@@ -1,10 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
-import BoothDetailsFormComponent from "@/components/BoothDetailsForm";
 import AuthButton from "@/components/AuthButton";
-import Footer from "@/components/Footer";
 import { redirect } from "next/navigation";
+import BoothHistory from "../../../components/BoothHistory";
+import Footer from "@/components/Footer";
+import BoothImages from "../../../components/BoothImages";
 
-export default async function BoothDetails() {
+export default async function BoothHistoryComponent() {
   const supabase = createClient();
   const {
     data: { user },
@@ -15,10 +16,10 @@ export default async function BoothDetails() {
   }
 
   const { data: booth_details } = await supabase.from("booth-details").select("*").eq("booth_officer_email", user.email);
-  //   console.log(booth_details);
   if (booth_details.length === 0) {
     return redirect("/login");
   }
+
   return (
     <>
       {/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
@@ -34,7 +35,7 @@ export default async function BoothDetails() {
           <AuthButton />
         </div>
       </nav>
-      <BoothDetailsFormComponent booth_details={booth_details[0]} />
+      <BoothImages booth_details={booth_details[0]} />
       <Footer />
     </>
   );
