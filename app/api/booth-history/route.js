@@ -23,6 +23,12 @@ export async function GET(request, { params }) {
     return NextResponse.json({ message: "Polling station number is empty" }, { status: 400 });
   }
 
+  const { data: booth_details } = await supabase.from("booth-details").select("*").eq("booth_id", booth_id).eq("constituency_id", constituency_id).eq("is_flagged", false);
+
+  if (booth_details.length === 0) {
+    return NextResponse.json({ message: "Polling station data not found" }, { status: 400 });
+  }
+
   const { data: booth_history } = await supabase.from("booth-history").select("*").eq("booth_id", booth_id).eq("constituency_id", constituency_id);
 
   if ((booth_history || []).length > 0) {
