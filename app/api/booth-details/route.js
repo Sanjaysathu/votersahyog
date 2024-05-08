@@ -27,7 +27,8 @@ export async function GET(request, { params }) {
     .from("booth-details")
     .select("booth_picture_1,booth_picture_2,booth_picture_3")
     .eq("booth_id", booth_id)
-    .eq("constituency_id", constituency_id);
+    .eq("constituency_id", constituency_id)
+    .eq("is_flagged", false);
 
   if ((booth_details || []).length > 0) {
     return NextResponse.json({ message: "Polling station details found", data: booth_details[0] }, { status: 200 });
