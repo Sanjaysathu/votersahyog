@@ -80,7 +80,7 @@ export default function Footer() {
         <div className="flex justify-center">
           <Photo />
         </div>{" "}
-        Pictures
+        PS Pictures
       </a>
     </div>
   );

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import BoothHistory from "../../../components/BoothHistory";
 import Footer from "@/components/Footer";
 import BoothImages from "../../../components/BoothImages";
+import Navbar from "@/components/Navbar";
 
 export default async function BoothHistoryComponent() {
   const supabase = createClient();
@@ -22,19 +23,18 @@ export default async function BoothHistoryComponent() {
 
   return (
     <>
-      {/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <AuthButton />
+      {/* <nav className="w-full flex border-b border-b-foreground/10 h-20 fixed top-0 z-10 bg-white shadow-sm">
+        <div>
+          <Image src="/images/sathyameva-jayathe.png" priority={true} height={80} width={80} alt="Sathyameva Jayathe" />
         </div>
+        <div className=" self-center">
+          <div className="font-semibold text-xl">Office of the SDO, EGRA</div>
+          <div className="font-semibold text-base">Voter Sahayata Portal</div>
+        </div>
+        <Menu user={user} signOut={signOut} />
+        
       </nav> */}
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="self-center font-semibold text-xl px-4">
-          <a href="/">Voter Sahyog</a>
-        </div>
-        <div className="ml-auto max-w-4xl flex justify-between items-center py-3 px-4 text-sm">
-          <AuthButton />
-        </div>
-      </nav>
+      <Navbar />
       <BoothImages booth_details={booth_details[0]} />
       <Footer />
     </>

@@ -37,14 +37,13 @@ export default function BoothDetailsFormComponent({ booth_details }) {
       // Handle error
     } else {
       setState((prevState) => ({ ...prevState, booth_image: `https://mfyxvwjwekbbihjgapjr.supabase.co/storage/v1/object/public/booth-pictures${file_path}` }));
-      console.log(data);
       // https://mfyxvwjwekbbihjgapjr.supabase.co/storage/v1/object/public/booth-pictures/challenge-5.svg
       // Handle success
     }
   };
 
   return (
-    <div className="mt-6 w-full px-4 md:w-1/3 mb-20">
+    <div className="mt-6 w-full px-4 md:w-1/3 mb-20 pt-20">
       <Toaster position="bottom-center" />
       <form>
         <div className="mb-6">
@@ -60,7 +59,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           {/* <Select value={{ label: booth_details.block_name, value: booth_details.block_name }} instanceId="block" /> */}
         </div>
         <div className="mb-6">
-          <div className="text-md font-medium">Polling Booth</div>
+          <div className="text-md font-medium">Polling station</div>
           <div>
             {booth_details.booth_id} - {booth_details.booth_name}
           </div>
@@ -79,13 +78,14 @@ export default function BoothDetailsFormComponent({ booth_details }) {
               value={state.entry_time}
               onChange={(e) => setState((prevState) => ({ ...prevState, entry_time: e.target.value }))}
               pattern="hh:mm"
+              disabled
               required
             />
           </div>
         </div>
         <div>
           <label className="text-md font-medium" htmlFor="male_count">
-            Number of male persons in line
+            Number of male persons in queue
           </label>
           <div>
             <input
@@ -105,7 +105,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
         </div>
         <div>
           <label className="text-md font-medium" htmlFor="female_count">
-            Number of female persons in line
+            Number of female persons in queue
           </label>
           <div>
             <input
@@ -124,7 +124,7 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           </div>
         </div>
         <div>
-          <label className="text-md font-medium">Total number of persons in line</label>
+          <label className="text-md font-medium">Total number of persons in queue</label>
           <div>
             <input
               className="rounded-md px-4 py-2 bg-inherit border mb-6 cursor-not-allowed read-only:bg-gray-200"
@@ -135,13 +135,13 @@ export default function BoothDetailsFormComponent({ booth_details }) {
           </div>
         </div>
         <div className="mb-6">
-          <div className="text-md font-medium mb-2">Picture of the booth</div>
+          <div className="text-md font-medium mb-2">Picture of the queue</div>
           {state.booth_image && (
             <a href={state.booth_image} target="_blank" className="mb-3 block">
               <img src={state.booth_image} height="200px" width={200} alt="booth image" />
             </a>
           )}
-          <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full" />
+          <input type="file" accept="image/*" required onChange={handleFileUpload} className="w-full" />
         </div>
         <div className="mb-10">
           <SubmitButton formAction={updateBoothDetails} className="bg-black rounded-md px-10 py-2 text-white mb-2" pendingText="Submitting...">

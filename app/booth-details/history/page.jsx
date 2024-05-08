@@ -3,6 +3,7 @@ import AuthButton from "@/components/AuthButton";
 import { redirect } from "next/navigation";
 import BoothHistory from "../../../components/BoothHistory";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 
 export default async function BoothHistoryComponent() {
   const supabase = createClient();
@@ -28,18 +29,14 @@ export default async function BoothHistoryComponent() {
   return (
     <>
       {/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <AuthButton />
-        </div>
-      </nav> */}
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="self-center font-semibold text-xl px-4">
           <a href="/">Voter Sahyog</a>
         </div>
         <div className="ml-auto max-w-4xl flex justify-between items-center py-3 px-4 text-sm">
           <AuthButton />
         </div>
-      </nav>
+      </nav> */}
+      <Navbar />
       <BoothHistory booth_history={booth_history} />
       <Footer />
     </>

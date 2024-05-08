@@ -1,10 +1,15 @@
 "use client";
 import { useState } from "react";
 import Select from "react-select";
-import { PATASHPUR_1_OPTIONS, PATASHPUR_2_OPTIONS, PATASHPUR_1_MAP_OPTIONS, PATASHPUR_2_MAP_OPTIONS } from "./constants/patashpur";
-import { EGRA_1_MAP_OPTIONS, EGRA_1_OPTIONS, EGRA_2_MAP_OPTIONS, EGRA_2_OPTIONS, EGRA_MUNICIPALITY_MAP_OPTIONS, EGRA_MUNICIPALITY_OPTIONS } from "./constants/egra";
-import { BHAGWANPUR_1_OPTIONS, BHAGWANPUR_2_OPTIONS, BHAGWANPUR_1_MAP_OPTIONS, BHAGWANPUR_2_MAP_OPTIONS } from "./constants/bhagwanpur";
+import dynamic from "next/dynamic";
 import toast, { Toaster } from "react-hot-toast";
+
+// import { PATASHPUR_1_OPTIONS, PATASHPUR_2_OPTIONS, PATASHPUR_MAPS_MAPPING } from "./constants/patashpur";
+// import { EGRA_1_OPTIONS, EGRA_2_OPTIONS, EGRA_MAPS_MAPPING, EGRA_MUNICIPALITY_OPTIONS } from "./constants/egra";
+// import {  BHAGWANPUR_MAPS_MAPPING } from "./constants/bhagwanpur";
+
+import Loader from "../Loader";
+const LineGraph = dynamic(() => import("./graph"), { loading: () => <Loader /> });
 
 const PARLIAMENTARY_OPTIONS = ["31-Kanthi", "34-Medinipur"];
 
@@ -21,39 +26,48 @@ export default function DashboardComponent() {
   const [selectedConstituency, setConstituency] = useState("");
   const [selectedBlock, setBlock] = useState("");
   const [selectedPollingStation, setPollingStation] = useState("");
-  const [liveCount, setLiveCount] = useState({});
   const [boothPictures, setBoothPictures] = useState({});
+  const [isFetching, setIsFetching] = useState(false);
+  const [data, setData] = useState([]);
+  const [pollingStationOptions, setPollingStationOptions] = useState(null);
+  const [pollingStationLocation, setPollingStationLocation] = useState("");
 
-  const getPollingStationOptions = () => {
-    if (selectedConstituency === "212 Patashpur") {
+  const getPollingStationOptions = async (constituency, block) => {
+    let options = [];
+    if (constituency === "212 Patashpur") {
+      const { PATASHPUR_1_OPTIONS, PATASHPUR_2_OPTIONS } = await import("./constants/patashpur");
       const pollingStationsMapping = { "Patashpur-1": PATASHPUR_1_OPTIONS, "Patashpur-2": PATASHPUR_2_OPTIONS };
-      return pollingStationsMapping[selectedBlock];
-    } else if (selectedConstituency === "214 Bhagwanpur") {
+      options = block ? pollingStationsMapping[block] : [...PATASHPUR_1_OPTIONS, ...PATASHPUR_2_OPTIONS];
+      setPollingStationOptions(options);
+    } else if (constituency === "214 Bhagwanpur") {
+      const { BHAGWANPUR_1_OPTIONS, BHAGWANPUR_2_OPTIONS } = await import("./constants/bhagwanpur");
       const pollingStationsMapping = { "Bhagwanpur-1": BHAGWANPUR_1_OPTIONS, "Bhagwanpur-2": BHAGWANPUR_2_OPTIONS };
-      return pollingStationsMapping[selectedBlock];
-    } else if (selectedConstituency === "218 Egra") {
+      options = block ? pollingStationsMapping[block] : [...BHAGWANPUR_1_OPTIONS, ...BHAGWANPUR_2_OPTIONS];
+      setPollingStationOptions(options);
+    } else if (constituency === "218 Egra") {
+      const { EGRA_1_OPTIONS, EGRA_2_OPTIONS, EGRA_MUNICIPALITY_OPTIONS } = await import("./constants/egra");
       const pollingStationsMapping = { "Egra-1": EGRA_1_OPTIONS, "Egra-2": EGRA_2_OPTIONS, "Egra Municipality": EGRA_MUNICIPALITY_OPTIONS };
-      return pollingStationsMapping[selectedBlock];
+      options = block ? pollingStationsMapping[block] : [...EGRA_1_OPTIONS, ...EGRA_2_OPTIONS, ...EGRA_MUNICIPALITY_OPTIONS];
+      setPollingStationOptions(options);
     }
-    return [];
   };
 
-  const getPollingLocation = () => {
-    if (selectedConstituency === "212 Patashpur") {
-      const pollingStationsMapsMapping = { "Patashpur-1": PATASHPUR_1_MAP_OPTIONS, "Patashpur-2": PATASHPUR_2_MAP_OPTIONS };
-      const pollingStationsMapping = { "Patashpur-1": PATASHPUR_1_OPTIONS, "Patashpur-2": PATASHPUR_2_OPTIONS };
-      const location = pollingStationsMapsMapping[selectedBlock][pollingStationsMapping[selectedBlock].findIndex((el) => el === selectedPollingStation)];
-      return location;
-    } else if (selectedConstituency === "214 Bhagwanpur") {
-      const pollingStationsMapsMapping = { "Bhagwanpur-1": BHAGWANPUR_1_MAP_OPTIONS, "Bhagwanpur-2": BHAGWANPUR_2_MAP_OPTIONS };
-      const pollingStationsMapping = { "Bhagwanpur-1": BHAGWANPUR_1_OPTIONS, "Bhagwanpur-2": BHAGWANPUR_2_OPTIONS };
-      const location = pollingStationsMapsMapping[selectedBlock][pollingStationsMapping[selectedBlock].findIndex((el) => el === selectedPollingStation)];
-      return location;
-    } else if (selectedConstituency === "218 Egra") {
-      const pollingStationsMapsMapping = { "Egra-1": EGRA_1_MAP_OPTIONS, "Egra-2": EGRA_2_MAP_OPTIONS, "Egra Municipality": EGRA_MUNICIPALITY_MAP_OPTIONS };
-      const pollingStationsMapping = { "Egra-1": EGRA_1_OPTIONS, "Egra-2": EGRA_2_OPTIONS, "Egra Municipality": EGRA_MUNICIPALITY_OPTIONS };
-      const location = pollingStationsMapsMapping[selectedBlock][pollingStationsMapping[selectedBlock].findIndex((el) => el === selectedPollingStation)];
-      return location;
+  const getPollingLocation = async (booth) => {
+    const booth_id = booth?.split("-")[0]?.trim();
+    if (booth_id) {
+      if (selectedConstituency === "212 Patashpur") {
+        const { PATASHPUR_MAPS_MAPPING } = await import("./constants/patashpur");
+        const location = PATASHPUR_MAPS_MAPPING[booth_id];
+        setPollingStationLocation(location);
+      } else if (selectedConstituency === "214 Bhagwanpur") {
+        const { BHAGWANPUR_MAPS_MAPPING } = await import("./constants/bhagwanpur");
+        const location = BHAGWANPUR_MAPS_MAPPING[booth_id];
+        setPollingStationLocation(location);
+      } else if (selectedConstituency === "218 Egra") {
+        const { EGRA_MAPS_MAPPING } = await import("./constants/egra");
+        const location = EGRA_MAPS_MAPPING[booth_id];
+        setPollingStationLocation(location);
+      }
     }
     return null;
   };
@@ -61,16 +75,19 @@ export default function DashboardComponent() {
   const fetchPollingStationDetails = async (booth_name) => {
     const booth_id = booth_name.split("-")[0]?.trim();
     const constituency_id = selectedConstituency.split(" ")[0]?.trim();
+    setIsFetching(true);
     const booth_history_res = await fetch(`/api/booth-history?booth_id=${booth_id}&constituency_id=${constituency_id}`, { method: "GET" });
-    const booth_details_res = await fetch(`/api/booth-details?booth_id=${booth_id}&constituency_id=${constituency_id}`, { method: "GET" });
     if (booth_history_res.ok) {
       const res_json = await booth_history_res.json();
-      setLiveCount(res_json.data.at(-1) || {});
+      setIsFetching(false);
+      setData(res_json.data);
     } else {
-      setLiveCount({});
+      setData([]);
       const res_json = await booth_history_res.json();
+      setIsFetching(false);
       toast.error(res_json.message);
     }
+    const booth_details_res = await fetch(`/api/booth-details?booth_id=${booth_id}&constituency_id=${constituency_id}`, { method: "GET" });
     if (booth_details_res.ok) {
       const res_json = await booth_details_res.json();
       setBoothPictures(res_json.data);
@@ -84,10 +101,13 @@ export default function DashboardComponent() {
       <Toaster position="bottom-center" />
       <div className="flex justify-center mt-6 mb-10 px-4 text-sm">
         <div className="w-full md:w-2/6">
-          <div className="font-medium">Parliamentary Constituency</div>
+          <div className="font-medium">
+            Parliamentary Constituency <span className="text-rose-700">*</span>
+          </div>
           <div className="mb-6">
             <Select
               isSearchable={false}
+              instanceId="Parliamentary Constituency"
               options={PARLIAMENTARY_OPTIONS.map((el) => ({ label: el, value: el }))}
               value={{ label: selectedParliament, value: selectedParliament }}
               onChange={(e) => {
@@ -95,19 +115,28 @@ export default function DashboardComponent() {
                 setConstituency("");
                 setBlock("");
                 setPollingStation("");
+                getPollingStationOptions();
+                setData([]);
+                setBoothPictures({});
               }}
             />
           </div>
-          <div className="font-medium">Assembly Constituency</div>
+          <div className="font-medium">
+            Assembly Constituency <span className="text-rose-700">*</span>
+          </div>
           <div className="mb-6">
             <Select
               isSearchable={false}
+              instanceId="Assembly Constituency"
               options={ASSEMBLY_OPTIONS[selectedParliament]?.map((el) => ({ label: el, value: el }))}
               value={{ label: selectedConstituency, value: selectedConstituency }}
               onChange={(e) => {
                 setConstituency(e.value);
                 setBlock("");
                 setPollingStation("");
+                getPollingStationOptions(e.value);
+                setData([]);
+                setBoothPictures({});
               }}
             />
           </div>
@@ -115,45 +144,57 @@ export default function DashboardComponent() {
           <div className="mb-6">
             <Select
               isSearchable={false}
+              instanceId="block"
               options={BLOCK_NAME_OPTIONS[selectedConstituency]?.map((el) => ({ label: el, value: el }))}
               value={{ label: selectedBlock, value: selectedBlock }}
               onChange={(e) => {
                 setBlock(e.value);
                 setPollingStation("");
+                getPollingStationOptions(selectedConstituency, e.value);
+                setData([]);
+                setBoothPictures({});
               }}
             />
           </div>
-          <div className="font-medium">Polling Station</div>
+          <div className="font-medium">
+            Part number/Polling station name <span className="text-rose-700">*</span>
+          </div>
           <div className="mb-6">
             <Select
-              options={getPollingStationOptions()?.map((el) => ({ label: el, value: el }))}
+              instanceId="polling"
+              options={pollingStationOptions?.map((el) => ({ label: el, value: el }))}
               value={{ label: selectedPollingStation, value: selectedPollingStation }}
               onChange={(e) => {
                 setPollingStation(e.value);
+                setData([]);
+                setBoothPictures({});
                 fetchPollingStationDetails(e.value);
+                getPollingLocation(e.value);
               }}
             />
           </div>
-          {Object.keys(liveCount).length > 0 && (
+          {isFetching && <Loader />}
+          {data.length > 0 && (
             <div>
-              <div className="font-medium">Entry time</div>
+              <LineGraph data={data} />
+              {/* <div className="font-medium">Entry time</div>
               <div className="mb-6">{liveCount.entry_time?.slice(0, -3)}</div>
               <div className="font-medium">Male persons in line</div>
               <div className="mb-6">{liveCount.male_count}</div>
               <div className="font-medium">Female persons in line</div>
               <div className="mb-6">{liveCount.female_count}</div>
               <div className="font-medium">Total persons in line</div>
-              <div className="mb-6">{liveCount.male_count + liveCount.female_count}</div>
-              {getPollingLocation() && (
-                <a className="mb-6 block text-blue-700" href={getPollingLocation()} target="_blank">
-                  View on map
+              <div className="mb-6">{liveCount.male_count + liveCount.female_count}</div> */}
+              {pollingStationLocation && (
+                <a className="mb-6 block text-blue-700 mt-6" href={pollingStationLocation} target="_blank">
+                  Click here to visit your polling station and vote
                 </a>
               )}
             </div>
           )}
           {Object.keys(boothPictures).length > 0 && (
             <div>
-              <div className="mb-3 font-medium">Booth pictures</div>
+              <div className="mb-3 font-medium">Today's polling station pictures</div>
               {boothPictures.booth_picture_1 && (
                 <a href={boothPictures.booth_picture_1} target="_blank" className="block mb-3">
                   <img src={boothPictures.booth_picture_1} />
